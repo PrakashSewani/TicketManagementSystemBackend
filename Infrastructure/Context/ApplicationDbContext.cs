@@ -29,6 +29,11 @@ namespace Infrastructure.Context
                 {
                     Id = Guid.Parse("6f2a960a-7d3b-4f61-881b-22ee6c319948"),
                     RoleName = "TheatreUser"
+                },
+                new Role
+                {
+                    Id = Guid.Parse("459a516b-7e76-4aca-a759-1ae1b100aa2d"),
+                    RoleName = "PlatformAdmin"
                 }
                 );
         }
