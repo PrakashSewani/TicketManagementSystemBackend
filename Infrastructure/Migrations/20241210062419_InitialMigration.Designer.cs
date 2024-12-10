@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241210050526_InitialMigration")]
+    [Migration("20241210062419_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />
@@ -59,6 +59,18 @@ namespace Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("RoleTable");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("3cab6048-0f28-4d60-828a-882cc2baa90d"),
+                            RoleName = "TheatreOwner"
+                        },
+                        new
+                        {
+                            Id = new Guid("6f2a960a-7d3b-4f61-881b-22ee6c319948"),
+                            RoleName = "TheatreUser"
+                        });
                 });
 
             modelBuilder.Entity("Domain.ScreenSeat", b =>

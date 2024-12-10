@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
+
 namespace Infrastructure.Migrations
 {
     /// <inheritdoc />
@@ -114,6 +116,15 @@ namespace Infrastructure.Migrations
                         column: x => x.ScreenId,
                         principalTable: "ScreenTable",
                         principalColumn: "Id");
+                });
+
+            migrationBuilder.InsertData(
+                table: "RoleTable",
+                columns: new[] { "Id", "RoleName" },
+                values: new object[,]
+                {
+                    { new Guid("3cab6048-0f28-4d60-828a-882cc2baa90d"), "TheatreOwner" },
+                    { new Guid("6f2a960a-7d3b-4f61-881b-22ee6c319948"), "TheatreUser" }
                 });
 
             migrationBuilder.CreateIndex(
