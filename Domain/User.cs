@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace Domain
+﻿namespace Domain
 {
     public class User
     {
@@ -8,7 +6,7 @@ namespace Domain
         public string Name { get; set; }
         public string Email { get; set; }
         public string Password { get; set; }
-        public PhoneAttribute MobileNumber { get; set; }
+        public long MobileNumber { get; set; }
         public Role Role { get; set; }
     }
 }
