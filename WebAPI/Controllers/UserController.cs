@@ -1,10 +1,12 @@
 ﻿using Application.Features.UserAuthentication.Commands;
+using Application.Features.UserAuthentication.Queries;
 using Application.Models.UserAuthentication;
 using Domain;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace WebAPI.Controllers
 {
@@ -34,12 +36,14 @@ namespace WebAPI.Controllers
         }
 
         [HttpPost("update")]
-        [AllowAnonymous]
+        [Authorize]
         public async Task<IActionResult> UpdateUser(UpdateUser Request)
         {
             try
             {
-                User Response = await _mediatrSender.Send(new UpdateUserRequest(Request));
+                var Identity = HttpContext.User.Identity as ClaimsIdentity;
+                string RoleClaim = Identity.FindFirst("Role").Value;
+                User Response = await _mediatrSender.Send(new UpdateUserRequest(Request, RoleClaim));
                 return Ok(Response);
             }
             catch (Exception ex)
@@ -56,6 +60,21 @@ namespace WebAPI.Controllers
             {
                 LoggedInUser Response = await _mediatrSender.Send(new LoginUserRequest(Request));
                 return Ok(Response);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpDelete("delete")]
+        [Authorize]
+        public async Task<IActionResult> DeleteUser(Guid Request)
+        {
+            try
+            {
+                await _mediatrSender.Send(new DeleteUserRequest(Request));
+                return Ok("Operation Successful");
             }
             catch (Exception ex)
             {

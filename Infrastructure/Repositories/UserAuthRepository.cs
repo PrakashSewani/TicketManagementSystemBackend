@@ -82,7 +82,7 @@ namespace Infrastructure.Repositories
         {
             try
             {
-                User UserInDb = await _context.UserTable.AsQueryable()
+                User UserInDb = await _context.UserTable.Include(d => d.Role).AsQueryable()
                     .Where(u => u.Id == Id)
                     .FirstOrDefaultAsync();
                 if (UserInDb == null) throw new ArgumentException("User does not exist in the Database");

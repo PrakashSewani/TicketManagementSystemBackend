@@ -23,7 +23,6 @@
   <ItemGroup>
     <Folder Include="Features\TheatreManagement\" />
     <Folder Include="Features\UserAuthentication\Validations\" />
-    <Folder Include="Features\UserAuthentication\Queries\" />
     <Folder Include="Models\TheatreManagement\" />
   </ItemGroup>
 

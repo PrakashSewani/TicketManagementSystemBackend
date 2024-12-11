@@ -1,9 +1,12 @@
-﻿namespace Application.Models.UserAuthentication
+﻿using Domain;
+
+namespace Application.Models.UserAuthentication
 {
     public class UpdateUser
     {
         public Guid Id { get; set; }
         public string Name { get; set; }
         public long MobileNumber { get; set; }
+        public Role Role { get; set; }
     }
 }

@@ -9,6 +9,7 @@ namespace Application.MappingProfiles
         public Mapping()
         {
             CreateMap<RegisterUser, User>();
+            CreateMap<UpdateUser, User>();
         }
     }
 }
