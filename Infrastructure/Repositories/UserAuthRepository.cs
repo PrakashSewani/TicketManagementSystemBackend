@@ -1,6 +1,7 @@
 ﻿using Application.Repositories;
 using Domain;
 using Infrastructure.Context;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -20,14 +21,35 @@ namespace Infrastructure.Repositories
             _context = context;
         }
 
-        public Task<bool> DeleteUserAsync(User User)
+        public async Task<bool> DeleteUserAsync(User User)
         {
-            throw new NotImplementedException();
+            try
+            {
+                _context.UserTable.Remove(User);
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
-        public Task<bool> ForgotPasswordAsync(User User)
+        public async Task<bool> ForgotPasswordAsync(User User)
         {
-            throw new NotImplementedException();
+            try
+            {
+                User UserInDb = await _context.UserTable.AsQueryable()
+                    .Where(u => u.Email == User.Email)
+                    .FirstOrDefaultAsync();
+                if (UserInDb == null) throw new ArgumentException("User does not exists in the Database");
+                UserInDb.Password = User.Password;
+                return true;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
         public Task<string> GenerateJwtTokenAsync(User User)
@@ -55,24 +77,76 @@ namespace Infrastructure.Repositories
             return Task.FromResult(jwtToken);
         }
 
-        public Task<User> GetUserByIdAsync(User User)
+        public async Task<User> GetUserByIdAsync(User User)
         {
-            throw new NotImplementedException();
+            try
+            {
+                User UserInDb = await _context.UserTable.AsQueryable()
+                    .Where(u => u.Id == User.Id)
+                    .FirstOrDefaultAsync();
+                if (UserInDb == null) throw new ArgumentException("User does not exist in the Database");
+                return UserInDb;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
-        public Task<User> LoginUserAsync(User User)
+        public async Task<User> LoginUserAsync(string EmailId, string Password)
         {
-            throw new NotImplementedException();
+            try
+            {
+                User UserInDb = await _context.UserTable.AsQueryable()
+                    .Where(u => u.Email == EmailId)
+                    .FirstOrDefaultAsync();
+                if (UserInDb == null) throw new ArgumentException("User doest not exists in Database, try Register User");
+                if (UserInDb.Password != Password) throw new ArgumentException("User EmailId/Password do not match. Try again later");
+                return UserInDb;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
-        public Task<bool> RegisterUserAsync(User User)
+        public async Task<bool> RegisterUserAsync(User User)
         {
-            throw new NotImplementedException();
+            try
+            {
+                User UserInDb = await _context.UserTable.AsQueryable()
+                    .Where(u => u.Email == User.Email)
+                    .FirstOrDefaultAsync();
+                if (UserInDb != null) throw new ArgumentException("User already exists in Database, try Forgot Password");
+                _context.UserTable.Add(User);
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
-        public Task<User> UpdateUserAsync(User User)
+        public async Task<User> UpdateUserAsync(User User)
         {
-            throw new NotImplementedException();
+            try
+            {
+                _context.UserTable.Update(User);
+                await _context.SaveChangesAsync();
+                return User;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<bool> ValidateUserRoleClaim(string RoleClaim, User User)
+        {
+            User UserInDb = await GetUserByIdAsync(User);
+            if (UserInDb.Role.RoleName == RoleClaim) return true;
+            throw new UnauthorizedAccessException("User Action forbidded since User has no sudo access.");
         }
     }
 }
