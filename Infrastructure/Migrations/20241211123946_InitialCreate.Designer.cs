@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241210062419_InitialMigration")]
-    partial class InitialMigration
+    [Migration("20241211123946_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -70,6 +70,11 @@ namespace Infrastructure.Migrations
                         {
                             Id = new Guid("6f2a960a-7d3b-4f61-881b-22ee6c319948"),
                             RoleName = "TheatreUser"
+                        },
+                        new
+                        {
+                            Id = new Guid("459a516b-7e76-4aca-a759-1ae1b100aa2d"),
+                            RoleName = "PlatformAdmin"
                         });
                 });
 

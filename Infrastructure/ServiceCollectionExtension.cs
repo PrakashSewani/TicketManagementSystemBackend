@@ -5,6 +5,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Application.Repositories;
+using Infrastructure.Repositories;
 
 namespace Infrastructure
 {
@@ -14,7 +16,8 @@ namespace Infrastructure
         {
             services
                .AddDbContext<ApplicationDbContext>(options => options
-               .UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
+               .UseSqlServer(configuration.GetConnectionString("DefaultConnection")))
+               .AddTransient<IUserAuthRepository, UserAuthRepository>();
 
             services
                 .AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>

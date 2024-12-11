@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialMigration : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -124,6 +124,7 @@ namespace Infrastructure.Migrations
                 values: new object[,]
                 {
                     { new Guid("3cab6048-0f28-4d60-828a-882cc2baa90d"), "TheatreOwner" },
+                    { new Guid("459a516b-7e76-4aca-a759-1ae1b100aa2d"), "PlatformAdmin" },
                     { new Guid("6f2a960a-7d3b-4f61-881b-22ee6c319948"), "TheatreUser" }
                 });
 

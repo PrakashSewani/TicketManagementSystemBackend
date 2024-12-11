@@ -1,4 +1,5 @@
-﻿using Application.Repositories;
+﻿using Application.Models.UserAuthentication;
+using Application.Repositories;
 using Domain;
 using Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
@@ -77,12 +78,12 @@ namespace Infrastructure.Repositories
             return Task.FromResult(jwtToken);
         }
 
-        public async Task<User> GetUserByIdAsync(User User)
+        public async Task<User> GetUserByIdAsync(Guid Id)
         {
             try
             {
                 User UserInDb = await _context.UserTable.AsQueryable()
-                    .Where(u => u.Id == User.Id)
+                    .Where(u => u.Id == Id)
                     .FirstOrDefaultAsync();
                 if (UserInDb == null) throw new ArgumentException("User does not exist in the Database");
                 return UserInDb;
@@ -93,16 +94,22 @@ namespace Infrastructure.Repositories
             }
         }
 
-        public async Task<User> LoginUserAsync(string EmailId, string Password)
+        public async Task<LoggedInUser> LoginUserAsync(string EmailId, string Password)
         {
             try
             {
-                User UserInDb = await _context.UserTable.AsQueryable()
+                User UserInDb = await _context.UserTable.Include(d => d.Role).AsQueryable()
                     .Where(u => u.Email == EmailId)
                     .FirstOrDefaultAsync();
                 if (UserInDb == null) throw new ArgumentException("User doest not exists in Database, try Register User");
                 if (UserInDb.Password != Password) throw new ArgumentException("User EmailId/Password do not match. Try again later");
-                return UserInDb;
+                string UserToken = await GenerateJwtTokenAsync(UserInDb);
+                LoggedInUser LoggedInUser = new LoggedInUser()
+                {
+                    User = UserInDb,
+                    BearerToken = UserToken
+                };
+                return LoggedInUser;
             }
             catch (Exception)
             {
@@ -110,7 +117,7 @@ namespace Infrastructure.Repositories
             }
         }
 
-        public async Task<bool> RegisterUserAsync(User User)
+        public async Task<User> RegisterUserAsync(User User)
         {
             try
             {
@@ -120,7 +127,7 @@ namespace Infrastructure.Repositories
                 if (UserInDb != null) throw new ArgumentException("User already exists in Database, try Forgot Password");
                 _context.UserTable.Add(User);
                 await _context.SaveChangesAsync();
-                return true;
+                return User;
             }
             catch (Exception)
             {
@@ -144,7 +151,7 @@ namespace Infrastructure.Repositories
 
         public async Task<bool> ValidateUserRoleClaim(string RoleClaim, User User)
         {
-            User UserInDb = await GetUserByIdAsync(User);
+            User UserInDb = await GetUserByIdAsync(User.Id);
             if (UserInDb.Role.RoleName == RoleClaim) return true;
             throw new UnauthorizedAccessException("User Action forbidded since User has no sudo access.");
         }
