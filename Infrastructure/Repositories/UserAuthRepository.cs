@@ -60,7 +60,6 @@ namespace Infrastructure.Repositories
 
             var Claims = new[]
             {
-                new Claim(JwtRegisteredClaimNames.Sub, User.Name),
                 new Claim(JwtRegisteredClaimNames.Email,User.Email),
                 new Claim("Role",User.Role.RoleName),
                 new Claim(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString())
@@ -127,7 +126,9 @@ namespace Infrastructure.Repositories
                 if (UserInDb != null) throw new ArgumentException("User already exists in Database, try Forgot Password");
                 _context.UserTable.Add(User);
                 await _context.SaveChangesAsync();
-                return User;
+                return await _context.UserTable.Include(d => d.Role).AsQueryable()
+                    .Where(u => u.Id == User.Id)
+                    .FirstOrDefaultAsync();
             }
             catch (Exception)
             {

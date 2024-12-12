@@ -26,7 +26,7 @@ namespace WebAPI.Controllers
         {
             try
             {
-                User Response = await _mediatrSender.Send(new RegisterUserRequest(Request));
+                LoggedInUser Response = await _mediatrSender.Send(new RegisterUserRequest(Request));
                 return Ok(Response);
             }
             catch (Exception ex)
@@ -36,7 +36,7 @@ namespace WebAPI.Controllers
         }
 
         [HttpPost("update")]
-        [AllowAnonymous]
+        [Authorize]
         public async Task<IActionResult> UpdateUser(UpdateUser Request)
         {
             try

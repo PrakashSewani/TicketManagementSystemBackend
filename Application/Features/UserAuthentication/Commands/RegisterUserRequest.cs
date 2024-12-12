@@ -6,7 +6,7 @@ using MediatR;
 
 namespace Application.Features.UserAuthentication.Commands
 {
-    public class RegisterUserRequest : IRequest<User>
+    public class RegisterUserRequest : IRequest<LoggedInUser>
     {
         public RegisterUser UserRequest;
 
@@ -16,7 +16,7 @@ namespace Application.Features.UserAuthentication.Commands
         }
     }
 
-    public class RegisterUserRequestHandler : IRequestHandler<RegisterUserRequest, User>
+    public class RegisterUserRequestHandler : IRequestHandler<RegisterUserRequest, LoggedInUser>
     {
         private readonly IUserAuthRepository _userRepo;
         private readonly IMapper _mapper;
@@ -27,13 +27,19 @@ namespace Application.Features.UserAuthentication.Commands
             _mapper = mapper;
         }
 
-        public async Task<User> Handle(RegisterUserRequest request, CancellationToken cancellationToken)
+        public async Task<LoggedInUser> Handle(RegisterUserRequest request, CancellationToken cancellationToken)
         {
             try
             {
                 User RequestUser = _mapper.Map<User>(request.UserRequest);
                 User Response = await _userRepo.RegisterUserAsync(RequestUser);
-                return Response;
+                string UserToken = await _userRepo.GenerateJwtTokenAsync(Response);
+                LoggedInUser User = new()
+                {
+                    User = Response,
+                    BearerToken = UserToken
+                };
+                return User;
             }
             catch (Exception)
             {
