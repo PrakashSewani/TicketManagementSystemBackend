@@ -12,6 +12,7 @@ namespace Application.Repositories
         public Task<User> GetUserByIdAsync(Guid Id);
         public Task<bool> ForgotPasswordAsync(User User);
         public Task<string> GenerateJwtTokenAsync(User User);
-        public Task<bool> ValidateUserRoleClaim(string RoleClaim, User User);
+        public Task<bool> ValidateUserRoleClaim(Guid UserId);
+        public Task<List<User>> GetAllUsersAsync();
     }
 }

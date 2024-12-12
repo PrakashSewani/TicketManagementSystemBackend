@@ -4,7 +4,6 @@ using Application.Models.UserAuthentication;
 using Domain;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
@@ -67,12 +66,45 @@ namespace WebAPI.Controllers
 
         [HttpDelete("delete")]
         [Authorize]
-        public async Task<IActionResult> DeleteUser(Guid Request)
+        public async Task<IActionResult> DeleteUser(Guid UserGuid)
         {
             try
             {
-                await _mediatrSender.Send(new DeleteUserRequest(Request));
+                await _mediatrSender.Send(new DeleteUserRequest(UserGuid));
                 return Ok("Operation Successful");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpGet("get-all")]
+        [Authorize]
+        public async Task<IActionResult> GetAllUsers()
+        {
+            try
+            {
+                var Identity = HttpContext.User.Identity as ClaimsIdentity;
+                string GuidClaim = Identity.FindFirst("UserId").Value;
+                return Ok(await _mediatrSender.Send(new GetUserRequest(GuidClaim)));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPost("update-user-role")]
+        [Authorize]
+        public async Task<IActionResult> UpdateUserRole(UpdateUserRole Request)
+        {
+            try
+            {
+                var Identity = HttpContext.User.Identity as ClaimsIdentity;
+                string GuidClaim = Identity.FindFirst("UserId").Value;
+                User User = await _mediatrSender.Send(new UpdateUserRoleRequest(Request, Guid.Parse(GuidClaim)));
+                return Ok(User);
             }
             catch (Exception ex)
             {

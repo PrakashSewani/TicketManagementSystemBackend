@@ -62,6 +62,7 @@ namespace Infrastructure.Repositories
             {
                 new Claim(JwtRegisteredClaimNames.Email,User.Email),
                 new Claim("Role",User.Role.RoleName),
+                new Claim("UserId",User.Id.ToString()),
                 new Claim(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString())
             };
 
@@ -75,6 +76,20 @@ namespace Infrastructure.Repositories
             var jwtToken = new JwtSecurityTokenHandler().WriteToken(Token);
 
             return Task.FromResult(jwtToken);
+        }
+
+        public async Task<List<User>> GetAllUsersAsync()
+        {
+            try
+            {
+                return await _context.UserTable.Include(d => d.Role).AsQueryable()
+                .Where(u => u.Role.RoleName == "TheatreUser" || u.Role.RoleName == "TheatreOwner")
+                .ToListAsync();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
         public async Task<User> GetUserByIdAsync(Guid Id)
@@ -150,11 +165,18 @@ namespace Infrastructure.Repositories
             }
         }
 
-        public async Task<bool> ValidateUserRoleClaim(string RoleClaim, User User)
+        public async Task<bool> ValidateUserRoleClaim(Guid UserId)
         {
-            User UserInDb = await GetUserByIdAsync(User.Id);
-            if (UserInDb.Role.RoleName == RoleClaim) return true;
-            throw new UnauthorizedAccessException("User Action forbidded since User has no sudo access.");
+            try
+            {
+                User UserInDb = await GetUserByIdAsync(UserId);
+                if (UserInDb.Role.RoleName == "PlatformAdmin") return true;
+                throw new UnauthorizedAccessException("User Action forbidded since User has no sudo access.");
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
     }
 }
