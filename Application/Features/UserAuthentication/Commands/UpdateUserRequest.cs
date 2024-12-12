@@ -9,12 +9,10 @@ namespace Application.Features.UserAuthentication.Commands
     public class UpdateUserRequest : IRequest<User>
     {
         public UpdateUser UserRequest;
-        public string UserRoleClaim;
 
-        public UpdateUserRequest(UpdateUser userRequest, string userRoleClaim)
+        public UpdateUserRequest(UpdateUser userRequest)
         {
             UserRequest = userRequest;
-            UserRoleClaim = userRoleClaim;
         }
     }
 
@@ -37,16 +35,6 @@ namespace Application.Features.UserAuthentication.Commands
                 User UserInDb = await _userRepo.GetUserByIdAsync(request.UserRequest.Id);
                 UserInDb.Name = request.UserRequest.Name;
                 UserInDb.MobileNumber = request.UserRequest.MobileNumber;
-                if (request.UserRequest.Role.RoleName != "TheatreUser")
-                {
-                    bool ValidRoleClaim = await _userRepo.ValidateUserRoleClaim(request.UserRoleClaim, RoleClaimUser);
-                    UserInDb.Role = new Role()
-                    {
-                        Id = request.UserRequest.Role.Id,
-                        RoleName = request.UserRequest.Role.RoleName,
-                    };
-                }
-
                 User Response = await _userRepo.UpdateUserAsync(UserInDb);
                 return Response;
             }

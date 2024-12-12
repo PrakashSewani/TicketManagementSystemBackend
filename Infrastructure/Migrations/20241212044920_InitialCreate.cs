@@ -47,7 +47,7 @@ namespace Infrastructure.Migrations
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Password = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     MobileNumber = table.Column<long>(type: "bigint", nullable: false),
-                    RoleId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+                    RoleId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -56,7 +56,8 @@ namespace Infrastructure.Migrations
                         name: "FK_UserTable_RoleTable_RoleId",
                         column: x => x.RoleId,
                         principalTable: "RoleTable",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(

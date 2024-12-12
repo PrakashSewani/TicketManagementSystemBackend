@@ -36,14 +36,12 @@ namespace WebAPI.Controllers
         }
 
         [HttpPost("update")]
-        [Authorize]
+        [AllowAnonymous]
         public async Task<IActionResult> UpdateUser(UpdateUser Request)
         {
             try
             {
-                var Identity = HttpContext.User.Identity as ClaimsIdentity;
-                string RoleClaim = Identity.FindFirst("Role").Value;
-                User Response = await _mediatrSender.Send(new UpdateUserRequest(Request, RoleClaim));
+                User Response = await _mediatrSender.Send(new UpdateUserRequest(Request));
                 return Ok(Response);
             }
             catch (Exception ex)

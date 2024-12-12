@@ -36,6 +36,10 @@ namespace Infrastructure.Context
                     RoleName = "PlatformAdmin"
                 }
                 );
+
+            modelBuilder.Entity<User>()
+                .Property(u => u.RoleId)
+                .HasDefaultValue(Guid.Parse("6f2a960a-7d3b-4f61-881b-22ee6c319948"));
         }
     }
 }
